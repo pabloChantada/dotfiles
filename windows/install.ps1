@@ -1,12 +1,12 @@
-# Instalador de la parte Windows.
-# Ejecutar desde PowerShell NORMAL (no como administrador):
-#   powershell -ExecutionPolicy Bypass -File \\wsl.localhost\Ubuntu\home\<usuario>\dotfiles\windows\install.ps1
+# Windows-side installer.
+# Run from a REGULAR PowerShell (not as administrator):
+#   powershell -ExecutionPolicy Bypass -File \\wsl.localhost\Ubuntu\home\<user>\dotfiles\windows\install.ps1
 
 $ErrorActionPreference = 'Continue'
 
 function Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Magenta }
 
-# --- Apps con winget ----------------------------------------------------------
+# --- Apps via winget -----------------------------------------------------------
 Step 'Instalando apps con winget'
 $apps = @(
   'wez.wezterm',
@@ -20,7 +20,7 @@ foreach ($app in $apps) {
   winget install --id $app -e --accept-package-agreements --accept-source-agreements
 }
 
-# --- Scoop (herramientas sin admin) -------------------------------------------
+# --- Scoop (tools without admin) ----------------------------------------------
 Step 'Instalando Scoop'
 if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
@@ -29,7 +29,7 @@ if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
   Write-Host '  Scoop ya instalado'
 }
 
-# Refrescar PATH en esta sesión para que encuentre scoop y code
+# Refresh PATH in this session so scoop and code are found
 $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
             [Environment]::GetEnvironmentVariable('Path', 'User')
 
@@ -38,10 +38,10 @@ scoop install git
 scoop bucket add nerd-fonts
 scoop install nerd-fonts/JetBrainsMono-NF
 
-# --- Extensiones de VS Code ----------------------------------------------------
+# --- VS Code extensions -------------------------------------------------------
 Step 'Extensiones de VS Code'
 $extensions = @(
-  'ms-vscode-remote.remote-wsl',   # trabajar dentro de WSL
+  'ms-vscode-remote.remote-wsl',   # work inside WSL
   'ms-python.python',
   'ms-toolsai.jupyter',
   'charliermarsh.ruff',

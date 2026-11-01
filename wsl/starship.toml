@@ -49,10 +49,10 @@ error_symbol = "[❯](bold red)"
 vimcmd_symbol = "[❮](bold green)"
 
 [palettes.kanagawa_dragon]
-lavender = "#8ba4b1"   # azul (directorio)
-mauve = "#a292a3"      # violeta (rama git)
+lavender = "#8ba4b1"   # blue (directory)
+mauve = "#a292a3"      # violet (git branch)
 red = "#c4746e"
-peach = "#b6927b"      # naranja (duración)
+peach = "#b6927b"      # orange (duration)
 yellow = "#c4b28a"
 green = "#8a9a7b"
 text = "#c5c9c5"

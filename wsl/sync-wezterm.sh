@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Copia dotfiles/windows/.wezterm.lua a tu carpeta de usuario de Windows.
-# (Windows no sigue bien los enlaces simbólicos de WSL, por eso se copia.)
+# Copies dotfiles/windows/.wezterm.lua to the Windows user folder.
+# (Windows doesn't follow WSL symlinks reliably, so it's copied.)
 set -euo pipefail
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 

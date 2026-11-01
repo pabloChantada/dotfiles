@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Status line de Claude Code: modelo | carpeta (rama git)
+# Claude Code status line: model | folder (git branch)
 input=$(cat)
 model=$(jq -r '.model.display_name // "?"' <<<"$input")
 dir=$(jq -r '.workspace.current_dir // .cwd // empty' <<<"$input")

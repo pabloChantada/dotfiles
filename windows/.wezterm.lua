@@ -1,11 +1,11 @@
--- ~/.wezterm.lua  (en Windows: C:\Users\<tu_usuario>\.wezterm.lua)
--- Fuente de verdad: dotfiles/windows/.wezterm.lua -> se copia con wsl/sync-wezterm.sh
+-- ~/.wezterm.lua  (on Windows: C:\Users\<user>\.wezterm.lua)
+-- Source of truth: dotfiles/windows/.wezterm.lua -> copied by wsl/sync-wezterm.sh
 local wezterm = require 'wezterm'
 local act = wezterm.action
 local config = wezterm.config_builder()
 
 -------------------------------------------------------------------------------
--- WSL por defecto, arrancando en tu home de Linux
+-- WSL by default, starting in the Linux home
 -------------------------------------------------------------------------------
 config.wsl_domains = {
   { name = 'WSL:Ubuntu', distribution = 'Ubuntu', default_cwd = '~' },
@@ -13,9 +13,9 @@ config.wsl_domains = {
 config.default_domain = 'WSL:Ubuntu'
 
 -------------------------------------------------------------------------------
--- Apariencia
+-- Appearance
 -------------------------------------------------------------------------------
--- Kanagawa Dragon: misma paleta que tu config de Ghostty y tu Neovim
+-- Kanagawa Dragon: same palette as the Ghostty and Neovim configs
 config.color_schemes = {
   ['Kanagawa Dragon'] = {
     foreground = '#c5c9c5',
@@ -46,8 +46,8 @@ config.line_height = 1.05
 
 config.window_decorations = 'INTEGRATED_BUTTONS|RESIZE'
 config.window_padding = { left = 8, right = 8, top = 6, bottom = 4 }
-config.window_background_opacity = 0.9 -- como en Ghostty; tu Neovim es transparente y se ve este fondo
--- config.win32_system_backdrop = 'Acrylic' -- desenfoque estilo Windows 11 (prueba si te gusta)
+config.window_background_opacity = 0.9 -- same as Ghostty; Neovim is transparent and shows this background
+-- config.win32_system_backdrop = 'Acrylic' -- Windows 11 style blur (optional)
 config.initial_cols = 140
 config.initial_rows = 38
 
@@ -61,20 +61,20 @@ config.audible_bell = 'Disabled'
 config.scrollback_lines = 10000
 config.max_fps = 120
 
--- Protocolo de teclado de kitty: permite que Neovim reciba Ctrl+1..4 (Harpoon),
--- Ctrl+Shift+letra, etc. Solo se activa cuando la app lo pide.
+-- Kitty keyboard protocol: lets Neovim receive Ctrl+1..4 (Harpoon),
+-- Ctrl+Shift+letter, etc. Only enabled when the app requests it.
 config.enable_kitty_keyboard = true
 
 -------------------------------------------------------------------------------
--- Atajos estilo tmux. Leader = Ctrl+a (pulsa Ctrl+a y luego la tecla)
--- Pensado para teclado español: nada de | ni \ que requieren AltGr.
+-- tmux-style keys. Leader = Ctrl+a (press Ctrl+a, then the key)
+-- Designed for a Spanish keyboard: no | or \, which need AltGr.
 -------------------------------------------------------------------------------
 config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
 
 config.keys = {
-  -- Paneles
-  { key = 'v', mods = 'LEADER', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } }, -- lado a lado
-  { key = 's', mods = 'LEADER', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },   -- uno encima de otro
+  -- Panes
+  { key = 'v', mods = 'LEADER', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } }, -- side by side
+  { key = 's', mods = 'LEADER', action = act.SplitVertical { domain = 'CurrentPaneDomain' } },   -- stacked
   { key = 'h', mods = 'LEADER', action = act.ActivatePaneDirection 'Left' },
   { key = 'j', mods = 'LEADER', action = act.ActivatePaneDirection 'Down' },
   { key = 'k', mods = 'LEADER', action = act.ActivatePaneDirection 'Up' },
@@ -83,13 +83,13 @@ config.keys = {
   { key = 'x', mods = 'LEADER', action = act.CloseCurrentPane { confirm = true } },
   { key = 'r', mods = 'LEADER', action = act.ActivateKeyTable { name = 'resize_pane', one_shot = false } },
 
-  -- Pestañas
+  -- Tabs
   { key = 'c', mods = 'LEADER', action = act.SpawnTab 'CurrentPaneDomain' },
   { key = 'n', mods = 'LEADER', action = act.ActivateTabRelative(1) },
   { key = 'p', mods = 'LEADER', action = act.ActivateTabRelative(-1) },
   { key = 't', mods = 'LEADER', action = act.ShowTabNavigator },
 
-  -- Layout de desarrollo: Claude Code en un panel a la derecha (35%)
+  -- Dev layout: Claude Code in a pane on the right (35%)
   {
     key = 'd',
     mods = 'LEADER',
@@ -100,14 +100,14 @@ config.keys = {
     },
   },
 
-  -- Paleta de comandos de WezTerm
+  -- WezTerm command palette
   { key = 'Space', mods = 'LEADER', action = act.ActivateCommandPalette },
 
-  -- Ctrl+a dos veces envía Ctrl+a real (inicio de línea en zsh)
+  -- Ctrl+a twice sends a literal Ctrl+a (start of line in zsh)
   { key = 'a', mods = 'LEADER|CTRL', action = act.SendKey { key = 'a', mods = 'CTRL' } },
 }
 
--- Leader + número: ir a la pestaña N
+-- Leader + number: go to tab N
 for i = 1, 9 do
   table.insert(config.keys, { key = tostring(i), mods = 'LEADER', action = act.ActivateTab(i - 1) })
 end
@@ -124,7 +124,7 @@ config.key_tables = {
 }
 
 -------------------------------------------------------------------------------
--- Indicador en la barra cuando el leader o el modo resize están activos
+-- Status bar indicator when leader or resize mode is active
 -------------------------------------------------------------------------------
 wezterm.on('update-right-status', function(window, _)
   local text = ''

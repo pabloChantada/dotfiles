@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Instalador del entorno WSL (Ubuntu).
-# Uso:  cd ~/dotfiles && ./wsl/install.sh
-# Es seguro ejecutarlo varias veces: salta lo que ya está instalado y hace
-# backup (*.bak.<fecha>) de cualquier config tuya antes de reemplazarla.
+# WSL (Ubuntu) environment installer.
+# Usage:  cd ~/dotfiles && ./wsl/install.sh
+# Safe to run multiple times: skips what's already installed and backs up
+# (*.bak.<date>) any existing config before replacing it.
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -13,7 +13,7 @@ export PATH="$BIN:$PATH"
 log()  { printf '\n\033[1;35m==> %s\033[0m\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
 
-link() { # link <origen> <destino>
+link() { # link <source> <target>
   local src="$1" dst="$2"
   mkdir -p "$(dirname "$dst")"
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
@@ -24,7 +24,7 @@ link() { # link <origen> <destino>
   echo "  $dst -> $src"
 }
 
-clone_or_pull() { # clone_or_pull <repo> <carpeta>
+clone_or_pull() { # clone_or_pull <repo> <dir>
   if [ -d "$2/.git" ]; then git -C "$2" pull --quiet; else git clone --depth 1 "$1" "$2"; fi
 }
 
@@ -35,7 +35,7 @@ sudo apt upgrade -y
 sudo apt install -y zsh git curl wget unzip build-essential gpg ca-certificates \
   ripgrep fd-find bat jq btop python3 python3-venv
 
-# En Ubuntu bat y fd se llaman batcat y fdfind
+# On Ubuntu, bat and fd are installed as batcat and fdfind
 ln -sf "$(command -v batcat)" "$BIN/bat"
 ln -sf "$(command -v fdfind)" "$BIN/fd"
 
