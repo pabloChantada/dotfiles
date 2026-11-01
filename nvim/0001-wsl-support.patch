@@ -1,0 +1,145 @@
+From 76e435f5040238eaade0ab4c0632625a435bf8fe Mon Sep 17 00:00:00 2001
+From: Pablo Chantada <noreply@example.com>
+Date: Sun, 1 Nov 2026 18:25:27 +0100
+Subject: [PATCH] fix: WSL support (clipboard, treesitter master, ruff, GlazeWM
+ keymaps)
+
+- Use Windows clipboard (clip.exe/PowerShell) when running under WSL
+- Pin nvim-treesitter to master (main branch dropped nvim-treesitter.configs)
+- Format Python with ruff instead of black
+- Move split-moving maps from Alt+hjkl to <leader>w+hjkl (GlazeWM uses Alt+hjkl)
+- Create undodir if missing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ README.md                  |  3 ++-
+ lua/config/keymaps.lua     |  9 +++++----
+ lua/config/options.lua     | 17 ++++++++++++++++-
+ lua/config/set.lua         |  1 +
+ lua/plugins/formatter.lua  |  2 +-
+ lua/plugins/treesitter.lua |  3 +++
+ lua/plugins/whichkey.lua   |  1 +
+ 7 files changed, 29 insertions(+), 7 deletions(-)
+
+diff --git a/README.md b/README.md
+index 3e399d7..8b0b813 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ * **Neovim >= 0.10.0**: Obligatorio para el funcionamiento de `nvim-treesitter-context` y caracteristicas modernas de LSP.
+ * **Nerd Font**: Se requiere una fuente parcheada (ej. JetBrainsMono Nerd Font) para visualizar los iconos.
+-* **Terminal**: Configurado para Ghostty (recomendado) o Kitty.
++* **Terminal**: Ghostty o Kitty en Linux; WezTerm en Windows + WSL2 (ver [dotfiles](https://github.com/pabloChantada/dotfiles)).
+ 
+ ## Instalacion
+ 
+@@ -40,6 +40,7 @@ sudo apt install build-essential
+ sudo apt install ripgrep fd-find
+ 
+ # Soporte de Portapapeles (Instalar segun tu sistema grafico)
++# En WSL no hace falta nada: se usa clip.exe / PowerShell automaticamente
+ # Para Wayland (Ubuntu 22.04+ por defecto):
+ sudo apt install wl-clipboard
+ # Para X11 (Sistemas antiguos):
+diff --git a/lua/config/keymaps.lua b/lua/config/keymaps.lua
+index 6d22aeb..b9d64b4 100644
+--- a/lua/config/keymaps.lua
++++ b/lua/config/keymaps.lua
+@@ -26,10 +26,11 @@ keymap("n", "<C-j>", "<C-w>j", opts)
+ keymap("n", "<C-k>", "<C-w>k", opts)
+ keymap("n", "<C-l>", "<C-w>l", opts)
+ 
+-keymap("n", "<A-h>", "<C-w>H", opts)
+-keymap("n", "<A-j>", "<C-w>J", opts)
+-keymap("n", "<A-k>", "<C-w>K", opts)
+-keymap("n", "<A-l>", "<C-w>L", opts)
++-- Mover splits (antes Alt+hjkl, que GlazeWM captura a nivel de sistema)
++keymap("n", "<leader>wh", "<C-w>H", opts)
++keymap("n", "<leader>wj", "<C-w>J", opts)
++keymap("n", "<leader>wk", "<C-w>K", opts)
++keymap("n", "<leader>wl", "<C-w>L", opts)
+ 
+ -- Resize splits
+ keymap("n", "<C-Left>", ":vertical resize -2<CR>", opts)
+diff --git a/lua/config/options.lua b/lua/config/options.lua
+index da052a3..ceb7c11 100644
+--- a/lua/config/options.lua
++++ b/lua/config/options.lua
+@@ -5,7 +5,22 @@ vim.opt.clipboard = "unnamedplus"
+ local uname = vim.loop.os_uname().sysname
+ local is_wayland = os.getenv("WAYLAND_DISPLAY") ~= nil
+ 
+-if uname == "Linux" then
++if vim.fn.has("wsl") == 1 then
++  -- WSL: usar el portapapeles de Windows (WSLg define WAYLAND_DISPLAY,
++  -- pero wl-clipboard no sincroniza bien con Windows)
++  vim.g.clipboard = {
++    name = "WslClipboard",
++    copy = {
++      ["+"] = "clip.exe",
++      ["*"] = "clip.exe",
++    },
++    paste = {
++      ["+"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
++      ["*"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
++    },
++    cache_enabled = 0,
++  }
++elseif uname == "Linux" then
+   if is_wayland then
+     -- Wayland (Ubuntu default)
+     vim.g.clipboard = {
+diff --git a/lua/config/set.lua b/lua/config/set.lua
+index 12f264f..b23a530 100644
+--- a/lua/config/set.lua
++++ b/lua/config/set.lua
+@@ -11,6 +11,7 @@ vim.opt.expandtab = true
+ 
+ -- UNDO HISTORY
+ vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
++vim.fn.mkdir(vim.opt.undodir:get()[1], "p")
+ vim.opt.undofile = true
+ 
+ -- SEARCHES
+diff --git a/lua/plugins/formatter.lua b/lua/plugins/formatter.lua
+index cbc390b..4c14214 100644
+--- a/lua/plugins/formatter.lua
++++ b/lua/plugins/formatter.lua
+@@ -12,7 +12,7 @@ return {
+         javascriptreact = { "prettierd", "prettier" }, -- Soporte React
+         typescript = { "prettierd", "prettier" },
+         typescriptreact = { "prettierd", "prettier" },
+-        python = { "black" }, -- Aquí forzamos black en lugar de ruff
++        python = { "ruff_organize_imports", "ruff_format" }, -- ruff: mismo formato que usa Claude Code
+         cpp = { "clang-format" },
+         c = { "clang-format" },
+         markdown = { "prettierd" },
+diff --git a/lua/plugins/treesitter.lua b/lua/plugins/treesitter.lua
+index 3d17a96..df610bd 100644
+--- a/lua/plugins/treesitter.lua
++++ b/lua/plugins/treesitter.lua
+@@ -1,5 +1,8 @@
+ return {
+   "nvim-treesitter/nvim-treesitter",
++  -- La rama "main" (nueva por defecto) ya no tiene nvim-treesitter.configs;
++  -- esta config usa la API clásica, que vive en "master".
++  branch = "master",
+   build = ":TSUpdate",
+   config = function()
+     require("nvim-treesitter.configs").setup({
+diff --git a/lua/plugins/whichkey.lua b/lua/plugins/whichkey.lua
+index b98cdc1..f2306e2 100644
+--- a/lua/plugins/whichkey.lua
++++ b/lua/plugins/whichkey.lua
+@@ -11,6 +11,7 @@ return {
+ 			{ "<leader>g", group = "Git" },
+ 			{ "<leader>l", group = "LSP" },
+ 			{ "<leader>z", group = "Copilot" },
++			{ "<leader>w", group = "Mover split" },
+ 
+ 			{ "<leader>pv", ":Ex<CR>", desc = "File explorer" },
+ 			{ "<leader>r", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gI", desc = "Replace word under cursor" },
+-- 
+2.43.0
+

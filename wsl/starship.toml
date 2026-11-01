@@ -1,0 +1,58 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+palette = "kanagawa_dragon"
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$python\
+$nodejs\
+$cmd_duration\
+$line_break\
+$character"""
+
+[directory]
+style = "bold lavender"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " ro"
+
+[git_branch]
+symbol = " "
+style = "bold mauve"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "bold red"
+format = '([$all_status$ahead_behind]($style) )'
+
+[python]
+symbol = " "
+style = "yellow"
+format = '[${symbol}(${version} )(\($virtualenv\) )]($style)'
+
+[nodejs]
+symbol = " "
+style = "green"
+format = '[$symbol($version )]($style)'
+
+[cmd_duration]
+min_time = 2000
+style = "peach"
+format = '[took $duration]($style) '
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold green)"
+
+[palettes.kanagawa_dragon]
+lavender = "#8ba4b1"   # azul (directorio)
+mauve = "#a292a3"      # violeta (rama git)
+red = "#c4746e"
+peach = "#b6927b"      # naranja (duración)
+yellow = "#c4b28a"
+green = "#8a9a7b"
+text = "#c5c9c5"
