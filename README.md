@@ -159,10 +159,11 @@ Leader: `Ctrl+a` (press, release, then the key).
 | `Ctrl+a v` / `s` | Split vertical / horizontal |
 | `Ctrl+a h/j/k/l` | Move between panes |
 | `Ctrl+a z` | Zoom pane |
-| `Ctrl+a r` + `h/j/k/l` | Resize (Esc to exit) |
+| `Ctrl+a r`, then `h/j/k/l` | Resize (Esc or Enter to exit) |
 | `Ctrl+a x` | Close pane |
 | `Ctrl+a c` | New tab |
 | `Ctrl+a n` / `p` / `1-9` | Switch tab |
+| `Ctrl+a t` | Tab navigator |
 | `Ctrl+a d` | Claude Code in a pane on the right |
 | `Ctrl+a Space` | Command palette |
 | `Ctrl+a Ctrl+a` | Send `Ctrl+a` |
